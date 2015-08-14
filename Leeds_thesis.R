@@ -16,16 +16,19 @@ pip_raw$period <- as.factor(pip_raw$period)
 # period.
 library(plyr)
 
-vecdiff <- function(x) {
+timediff <- function(x) {
+    # explanaton
+    if (length(x) == 1)  return(x)
     xdiff <- diff(x, lag = 1, differences = 1)
     # how to deal with first element? I'll add a zero. Maybe add a large number
     # instead?
-    return(c(0, xdiff))
+    return(c(xdiff, 0)) # or c(xdiff, new_difftime(second=0))
 }
 
 # are t_sun values sorted correctly within period?  I'm assuming they are.
 
-pip2 <- ddply(pip_raw, .(period), mutate, t_sun_diff = vecdiff(t_sun))
+pip2 <- ddply(pip_raw, .(period), mutate, t_sun_diff = timediff(t_sun))
+
 pip_subset <- subset(pip2, t_sun_diff < 3) # but what about zeros added above?
                                            # Do you want the first in series or
                                            # not?
